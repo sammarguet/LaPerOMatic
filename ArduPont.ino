@@ -50,29 +50,28 @@
 
 /* ********************************************************************************
   For each pump, you will find a drink :
-  1 : Pontarlier-Anis
-  2 : Liqueur de Sapin
-  3 : Rhum
-  4 : 
-  5 : Jus d'Ananas
-  6 : Eau
-  7 : NC
-  8 : NC
-            1   2   3   4   5   6   7   8               
+  1 : Boisson n°1
+  2 : Boisson n°2
+  3 : Boisson n°3
+  4 : Boisson n°4
+  5 : Boisson n°5
+  6 : Boisson n°6
+  7 : Boisson n°7
+  8 : Boisson n°8
 ********************************************************************************* */
 
-//external void playRandom_A_and_N();
-
 /* 6 different cocktails are programmable by the user 999 for random */
-const int COCKTAILA[8]  {0    ,0    ,20   ,0    ,0    ,0    ,80   ,0    } ; // Anis
-const int COCKTAILB[8]  {10   ,0    ,15   ,0    ,0    ,0    ,75   ,0    } ; // Anis Menthe
-const int COCKTAILC[8]  {20   ,0    ,0    ,0    ,0    ,0    ,80   ,0    } ; // Menthe
-const int COCKTAILD[8]  {0    ,30   ,0    ,0    ,0    ,0    ,70   ,0    } ; // Grenadine
-const int COCKTAILE[8]  {10   ,0    ,0    ,0    ,0    ,20   ,70   ,0    } ; // Anis Grenadine
-const int COCKTAILF[8]  {0    ,0    ,0    ,0    ,0    ,40   ,60   ,0    } ; // Rose
-const int COCKTAILG[8]  {0    ,0    ,0    ,0    ,0    ,0    ,0    ,0    } ; // Vide
-const int COCKTAILH[8]  {0    ,0    ,0    ,0    ,20   ,0    ,80   ,0    } ; // Kiwi-banane
-const int POMPES[8]   {PM1  ,PM2  ,PM3  ,PM4  ,PM5  ,PM6  ,PM7  ,PM8  } ; // POMPES
+/* Chaque valeurs correspond à un pourcentage à servir */
+//                       1     2     3     4     5     6     7     8 
+const int COCKTAILA[8]  {0    ,0    ,20   ,0    ,0    ,0    ,80   ,0    } ; // 20% boisson n°3 et 80% boisson n°7
+const int COCKTAILB[8]  {10   ,0    ,15   ,0    ,0    ,0    ,75   ,0    } ; // 10% boisson n°1, 15% boisson n°3 et 75% boisson n°7
+const int COCKTAILC[8]  {20   ,0    ,0    ,0    ,0    ,0    ,80   ,0    } ; // 20% boisson n°1 et 80% boisson n°7
+const int COCKTAILD[8]  {0    ,30   ,0    ,0    ,0    ,0    ,70   ,0    } ; // 30% boisson n°2 et 70% boisson n°7
+const int COCKTAILE[8]  {10   ,0    ,0    ,0    ,0    ,20   ,70   ,0    } ; // 10% boisson n°1, 20% boisson n°6 et 70% boisson n°7
+const int COCKTAILF[8]  {0    ,0    ,0    ,0    ,0    ,40   ,60   ,0    } ; // 40% boisson n°6 et 60% boisson n°7
+const int COCKTAILG[8]  {10   ,10   ,0    ,0    ,0    ,0    ,0    ,80   } ; // 10% boisson n°1, 10% boisson n°2 et 80% boisson n°8
+const int COCKTAILH[8]  {0    ,0    ,0    ,0    ,20   ,0    ,80   ,0    } ; // 20% boisson n°5 et 80% boisson n°7
+const int POMPES[8]     {PM1  ,PM2  ,PM3  ,PM4  ,PM5  ,PM6  ,PM7  ,PM8  } ; // POMPES
 const int TIME_GLASS[6] {2500, 6700, 8000, 18500, 36000, 70000};
 const String NAME_GLASS[6] {"un shot", "un verre a Pont", "un gobelet", "un demi", "une pinte", "une bouteille"};
 
@@ -82,8 +81,8 @@ unsigned int glass ;            // This is the size of the glass you are gonna d
 unsigned int drink_state = 0 ;  // This is the state you are currently executing
 unsigned long time_now ;        // Time
 unsigned long time_previous ;   // Time
-  unsigned long time_spent ;    // Time
-unsigned int glass_empty = 0 ;    // Number of glasses given
+unsigned long time_spent ;      // Time
+unsigned int glass_empty = 0 ;  // Number of glasses given
 volatile int test = LOW ;
 
 LiquidCrystal lcd(LCD_RS, LCD_EN, LCD_D4, LCD_D5, LCD_D6, LCD_D7);
@@ -142,16 +141,14 @@ void setup() {
   attachInterrupt(BP4, GiveCocktailD, RISING);
   attachInterrupt(BP5, GiveCocktailE, RISING);
   attachInterrupt(BP6, GiveCocktailF, RISING);
-  //attachInterrupt(BP7, GiveCocktailG, RISING);
+  attachInterrupt(BP7, GiveCocktailG, RISING);
   attachInterrupt(BP8, GiveCocktailH, RISING);
-  
-  attachInterrupt(BP7, BiggerGlass, FALLING);
   
   attachInterrupt(BPH1, SetManual,  FALLING);
   attachInterrupt(BPH2, SetAuto,    FALLING);
   attachInterrupt(BPH3, PrintGlass, FALLING);
-/*  attachInterrupt(BPH4, SmallerGlass, FALLING);
-  attachInterrupt(BPH5, SmallerGlass, FALLING);
+  attachInterrupt(BPH4, BiggerGlass, FALLING);
+/*  attachInterrupt(BPH5, SmallerGlass, FALLING);
   attachInterrupt(BPH6, SmallerGlass, FALLING);
   attachInterrupt(BPH7, SmallerGlass, FALLING);
   attachInterrupt(BPH8, SmallerGlass, FALLING);*/
@@ -244,10 +241,12 @@ void GiveDrinks(const int *value)
   lcd.clear() ;
   lcd.setCursor(0, 0);
   lcd.print("Verre servi");
-  lcd.print("100 %");
-  delay(1000) ;
-  lcd.begin(16, 2);
   lcd.setCursor(0, 1);
+  lcd.print("100 %");
+  
+  delay(1000) ;
+  
+  lcd.begin(16, 2);
   lcd.clear() ;
   lcd.setCursor(0, 0);
   lcd.print(CATCH_PHRASE);
@@ -340,8 +339,6 @@ void loop() {
     if(!occupied)
     {
       occupied = true ;               // Block other ISR
-      /*__________TO DO______________*/
-      // TODO playRandom_A_and_N();
       switch(drink_state){
         case 1 :
           GiveDrinks(COCKTAILA) ;
