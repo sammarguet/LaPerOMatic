@@ -255,7 +255,7 @@ void GiveDrinks(const int *value)
 }
 
 /*
-  This function will give you a bigger glass, winner !
+  This function will give you a bigger glass !
 */
 
 void ChangeGlass(const bool bigger)
@@ -282,15 +282,6 @@ void BiggerGlass()
   if(!occupied)
     drink_state = 9 ;
 }
-
-/*
-  This function will give you a smaller glass, pussy !
-*/
-/*void SmallerGlass()
-{
-  drink_state = 8 ;
-}*/
-
 
 void PrintGlass()
 {
